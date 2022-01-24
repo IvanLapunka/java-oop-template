@@ -2,6 +2,8 @@ package com.epam.izh.rd.online.entity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.Objects;
 
@@ -54,19 +56,16 @@ public abstract class Book {
 
         Book book = (Book) o;
 
-        return new EqualsBuilder().append(numberOfPages, book.numberOfPages).append(name, book.name).isEquals();
+        return EqualsBuilder.reflectionEquals(this, o);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(numberOfPages).append(name).toHashCode();
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 
     @Override
     public String toString() {
-        return "Book{" +
-                "numberOfPages=" + numberOfPages +
-                ", name='" + name + '\'' +
-                '}';
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
     }
 }

@@ -3,6 +3,7 @@ package com.epam.izh.rd.online.repository;
 import com.epam.izh.rd.online.entity.Author;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class SimpleAuthorRepository implements AuthorRepository{
     private Author[] authors = new Author[0];
@@ -12,8 +13,7 @@ public class SimpleAuthorRepository implements AuthorRepository{
         if (findByFullName(author.getName(), author.getLastName()) != null) {
             return false;
         }
-        resize();
-        authors[authors.length - 1] = author;
+        authors = Stream.concat(Arrays.stream(authors), Stream.of(author)).toArray(Author[]::new);
         return true;
     }
 
@@ -29,37 +29,11 @@ public class SimpleAuthorRepository implements AuthorRepository{
 
     @Override
     public boolean remove(Author author) {
-        for (int i = 0; i < authors.length; i++) {
-            if (authors[i].equals(author)) {
-                authors[i] = null;
-                resize();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //можно ли завязываться на null? Например если что-то не нашли, то вернуть null?
-    private void resize() {
-        int removeCell = authors.length;
-        for (int i = 0; i < authors.length; i++) {
-            if (authors[i] == null) {
-                removeCell = i;
-                break;
-            }
-        }
-        Author[] newAuthors;
-        if (removeCell == authors.length) {
-            newAuthors = new Author[authors.length + 1];
-            System.arraycopy(authors, 0, newAuthors, 0, authors.length);
-        } else if (authors.length == 1){
-            newAuthors = new Author[0];
-        } else {
-            newAuthors = new Author[authors.length - 1];
-            System.arraycopy(authors, 0, newAuthors, 0, removeCell);
-            System.arraycopy(authors, removeCell + 1, newAuthors, removeCell, authors.length - removeCell - 1);
-        }
-        authors = newAuthors;
+        int beforeLength = authors.length;
+        authors = Arrays.stream(authors)
+                .filter(auth -> !auth.equals(author))
+                .toArray(Author[]::new);
+        return authors.length != beforeLength;
     }
 
     @Override
